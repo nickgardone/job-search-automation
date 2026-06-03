@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Daily PM job search — appends new listings to Nick Application Tracker.xlsx.
+Job search agent — appends new listings to Application Tracker.xlsx.
 Run via macOS LaunchAgent. Requires ANTHROPIC_API_KEY env var.
 """
 
@@ -19,11 +19,11 @@ from openpyxl.styles import Font, PatternFill
 
 # ── Paths ──────────────────────────────────────────────────────────────────────
 BASE    = Path("/Users/nickgardone/Documents/Business/Career/Applications")
-TRACKER = BASE / "Nick Application Tracker.xlsx"
+TRACKER = BASE / "Application Tracker.xlsx"
 LOG_FILE = BASE / "job_search.log"
 SHEET        = "Job Opportunities"
-TRACKER_NAME = "Nick Application Tracker.xlsx"
-LOCK_FILE    = BASE / "~$Nick Application Tracker.xlsx"
+TRACKER_NAME = "Application Tracker.xlsx"
+LOCK_FILE    = BASE / "~$Application Tracker.xlsx"
 
 # ── API pricing (claude-sonnet-4-6) ───────────────────────────────────────────
 INPUT_PRICE_PER_MTOK  = 3.00   # $ per million input tokens

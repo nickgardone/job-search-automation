@@ -12,32 +12,12 @@
     </array>
 
     <key>StartCalendarInterval</key>
-    <array>
-        <dict>
-            <key>Weekday</key>
-            <integer>1</integer>
-            <key>Hour</key>
-            <integer>8</integer>
-            <key>Minute</key>
-            <integer>0</integer>
-        </dict>
-        <dict>
-            <key>Weekday</key>
-            <integer>3</integer>
-            <key>Hour</key>
-            <integer>8</integer>
-            <key>Minute</key>
-            <integer>0</integer>
-        </dict>
-        <dict>
-            <key>Weekday</key>
-            <integer>5</integer>
-            <key>Hour</key>
-            <integer>8</integer>
-            <key>Minute</key>
-            <integer>0</integer>
-        </dict>
-    </array>
+    <dict>
+        <key>Hour</key>
+        <integer>8</integer>
+        <key>Minute</key>
+        <integer>0</integer>
+    </dict>
 
     <key>EnvironmentVariables</key>
     <dict>
@@ -51,7 +31,6 @@
     <key>StandardErrorPath</key>
     <string>/Users/nickgardone/Documents/Business/Career/Applications/job_search_stderr.log</string>
 
-    <!-- Do not run immediately on load — wait for scheduled time -->
     <key>RunAtLoad</key>
     <false/>
 </dict>
