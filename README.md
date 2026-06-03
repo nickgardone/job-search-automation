@@ -1,15 +1,22 @@
 # Job Search Automation
 
-Uses the Claude API to find PM job listings daily and append them to a local Excel tracker, color-coded by salary range.
+A Claude API agent that queries job listings daily and appends structured results to a local Excel tracker with salary-range color coding.
 
 ## How it works
 
-The script prompts Claude Sonnet (with web search) to find current PM job postings matching your criteria. New listings are appended to `Nick Application Tracker.xlsx` with rows color-coded by salary:
+The script uses Claude Sonnet with web search enabled to find current job postings matching configurable criteria. New listings are appended to a local `.xlsx` tracker, with rows color-coded by salary range:
 - Green: $150k+
 - Yellow: Salary not listed
 - Red: Below $150k
 
-Designed to run on a schedule via macOS LaunchAgent (Mon/Wed/Fri by default).
+Runs on a schedule via macOS LaunchAgent (Mon/Wed/Fri by default).
+
+## Stack
+
+- **Python** — orchestration layer
+- **Anthropic SDK** — Claude Sonnet with web search tool
+- **openpyxl** — Excel read/write
+- **macOS LaunchAgent** — local scheduling
 
 ## Setup
 
@@ -21,13 +28,13 @@ Designed to run on a schedule via macOS LaunchAgent (Mon/Wed/Fri by default).
    ```bash
    export ANTHROPIC_API_KEY=sk-ant-...
    ```
-3. Update the `BASE_PATH` in `job_search.py` to point to your Applications folder containing the tracker spreadsheet
+3. Update `BASE_PATH` in `job_search.py` to point to your tracker spreadsheet
 4. Run manually to verify output:
    ```bash
    python job_search.py
    ```
 
-## Scheduling with LaunchAgent
+## Scheduling
 
 Use the included `com.nickgardone.jobsearch.plist.template` to run on a schedule:
 
@@ -35,7 +42,7 @@ Use the included `com.nickgardone.jobsearch.plist.template` to run on a schedule
    ```bash
    cp com.nickgardone.jobsearch.plist.template ~/Library/LaunchAgents/com.nickgardone.jobsearch.plist
    ```
-2. Edit the plist to set the correct paths for `ProgramArguments` and `ANTHROPIC_API_KEY`
+2. Edit paths and `ANTHROPIC_API_KEY` in the plist
 3. Load the agent:
    ```bash
    launchctl load ~/Library/LaunchAgents/com.nickgardone.jobsearch.plist
@@ -46,4 +53,4 @@ Use the included `com.nickgardone.jobsearch.plist.template` to run on a schedule
 | File | Purpose |
 |---|---|
 | `job_search.py` | Main script — queries Claude API, appends to tracker |
-| `com.nickgardone.jobsearch.plist.template` | macOS LaunchAgent config template for scheduling |
+| `com.nickgardone.jobsearch.plist.template` | LaunchAgent config template |
