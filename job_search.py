@@ -23,6 +23,7 @@ TRACKER = BASE / "Nick Application Tracker.xlsx"
 LOG_FILE = BASE / "job_search.log"
 SHEET        = "Job Opportunities"
 TRACKER_NAME = "Nick Application Tracker.xlsx"
+LOCK_FILE    = BASE / "~$Nick Application Tracker.xlsx"
 
 # ── API pricing (claude-sonnet-4-6) ───────────────────────────────────────────
 INPUT_PRICE_PER_MTOK  = 3.00   # $ per million input tokens
@@ -83,19 +84,37 @@ def notify(title: str, message: str) -> None:
     ], check=False)
 
 
-def close_in_excel() -> None:
-    """Close the tracker in Excel (saving user edits first) so openpyxl can write cleanly."""
+def close_in_excel() -> bool:
+    """
+    Close the tracker in Excel (saving user edits) so openpyxl can write cleanly.
+    Returns True if the file lock was released, False if Excel held on.
+    """
+    if not LOCK_FILE.exists():
+        return True  # Excel doesn't have the file open — nothing to do
+
+    log.info("Excel has the file open — sending close command...")
     script = f'''
     tell application "Microsoft Excel"
-        if it is running then
-            set wb to (workbooks whose name is "{TRACKER_NAME}")
-            if (count of wb) > 0 then
-                close item 1 of wb saving yes
-            end if
+        set wb to (workbooks whose name is "{TRACKER_NAME}")
+        if (count of wb) > 0 then
+            close item 1 of wb saving yes
         end if
     end tell
     '''
-    subprocess.run(["osascript", "-e", script], check=False)
+    try:
+        subprocess.run(["osascript", "-e", script], check=False, timeout=10)
+    except subprocess.TimeoutExpired:
+        log.warning("AppleScript close command timed out")
+
+    # Poll for the lock file to disappear (up to 20 seconds)
+    for _ in range(20):
+        if not LOCK_FILE.exists():
+            log.info("Excel released the file lock")
+            return True
+        time.sleep(1)
+
+    log.warning("Excel did not release the file lock after 20s — save may be overwritten")
+    return False
 
 
 def open_in_excel() -> None:
@@ -275,12 +294,14 @@ def main() -> None:
     if new_listings:
         next_row = ws.max_row + 1
         append_rows(ws, new_listings, max_num + 1, next_row)
-        log.info("Closing tracker in Excel...")
-        close_in_excel()
+        released = close_in_excel()
+        if not released:
+            notify("Job Search ⚠️", f"{len(new_listings)} roles found — close the tracker in Excel then reopen to see them")
         wb.save(TRACKER)
         log.info(f"Saved. Rows added: {next_row}–{next_row + len(new_listings) - 1}")
-        open_in_excel()
-        log.info("Reopened tracker in Excel")
+        if released:
+            open_in_excel()
+            log.info("Reopened tracker in Excel")
 
     log.info(f"── Done. {len(new_listings)} added, {dupes} duplicates skipped ──\n")
     notify(
