@@ -20,7 +20,7 @@ from openpyxl.styles import Font, PatternFill
 # ── Paths ──────────────────────────────────────────────────────────────────────
 BASE    = Path("/Users/nickgardone/Documents/Business/Career/Applications")
 TRACKER = BASE / "Application Tracker.xlsx"
-LOG_FILE = BASE / "job_search.log"
+LOG_FILE = BASE / "job_discovery.log"
 SHEET        = "Job Opportunities"
 TRACKER_NAME = "Application Tracker.xlsx"
 LOCK_FILE    = BASE / "~$Application Tracker.xlsx"
